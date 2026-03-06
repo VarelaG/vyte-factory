@@ -68,8 +68,8 @@ export async function POST(request: NextRequest) {
         // 3. Fallo total
         return NextResponse.json({ error: 'Contraseña incorrecta' }, { status: 401 });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Login Error:', error);
-        return NextResponse.json({ error: 'Error interno en login' }, { status: 500 });
+        return NextResponse.json({ error: `Error interno de conexión a Base de Datos en Vercel/Hostinger: ${error?.message || error}` }, { status: 500 });
     }
 }
