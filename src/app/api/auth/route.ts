@@ -70,6 +70,8 @@ export async function POST(request: NextRequest) {
 
     } catch (error: any) {
         console.error('Login Error:', error);
-        return NextResponse.json({ error: `Error interno de conexión a Base de Datos en Vercel/Hostinger: ${error?.message || error}` }, { status: 500 });
+        // Hostinger Nginx suele interceptar los status 500 y devolver un HTML genérico ("<!DOCTYPE..."). 
+        // Usamos 400 temporalmente para que el Error JSON sí llegue al cliente y sepamos si es Prisma.
+        return NextResponse.json({ error: `Error interno de conexión a Base de Datos: ${error?.message || error}` }, { status: 400 });
     }
 }
