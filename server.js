@@ -1,26 +1,19 @@
-// server.js (Punto de entrada para la aplicación Node.js en Hostinger)
-const { createServer } = require('http');
-const { parse } = require('url');
-const next = require('next');
+const path = require('path')
+process.env.NODE_ENV = 'production'
 
-const dev = false; // Forzamos producción en Hostinger
-const hostname = 'localhost';
-// Hostinger inyecta el PORT dinámicamente o usamos 3000 de fallback
-const port = process.env.PORT || 3000;
+process.chdir(__dirname)
 
-// Init Next.js App
-const app = next({ dev, hostname, port });
-const handle = app.getRequestHandler();
+// Solo para asegurarnos de que escuche el puerto de Hostinger
+const port = process.env.PORT || 3000
+process.env.PORT = port
+process.env.HOSTNAME = '0.0.0.0'
 
-app.prepare().then(() => {
-    createServer((req, res) => {
-        const parsedUrl = parse(req.url, true);
-        handle(req, res, parsedUrl);
-    }).listen(port, (err) => {
-        if (err) throw err;
-        console.log(`> Servidor Vyte Factory listo en http://${hostname}:${port}`);
-    });
-}).catch((ex) => {
-    console.error('Error arrancando Next.js en Hostinger:', ex.stack);
-    process.exit(1);
-});
+require('dotenv').config()
+
+// Asegurarse de que el script arranca el servidor standalone de Next.js
+try {
+    require('./.next/standalone/server.js')
+} catch (err) {
+    console.error("No se encontró el servidor Standalone. ¿Se compiló bien en Hostinger?", err)
+    process.exit(1)
+}
