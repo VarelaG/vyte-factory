@@ -57,8 +57,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'slug requerido' }, { status: 400, headers: corsHeaders });
         }
 
-        // Validar que exista sesión y que coincida con el tenant que se quiere modificar
-        if (!cookieSlug || cookieSlug !== cliente_slug) {
+        // Validar que exista sesión.
+        // Si el cookieSlug es 'vyte' (Master), puede modificar cualquiera. Si no, debe coincidir con el cliente_slug.
+        if (!cookieSlug || (cookieSlug !== 'vyte' && cookieSlug !== cliente_slug)) {
             return NextResponse.json({ error: 'No autorizado / Sesión inválida' }, { status: 401, headers: corsHeaders });
         }
 
