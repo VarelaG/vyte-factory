@@ -227,7 +227,7 @@ export default function AdminDashboard() {
                             )}
                             <button
                                 onClick={handleSave}
-                                disabled={saving}
+                                disabled={saving || loading}
                                 className="px-6 py-2.5 bg-white text-black rounded-xl hover:bg-gray-200 transition font-black shadow-lg shadow-white/10 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 min-w-[180px]"
                             >
                                 {saving ? (
