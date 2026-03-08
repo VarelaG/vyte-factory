@@ -50,7 +50,7 @@ export default function AdminDashboard() {
 
     async function loadTenantData(slug: string) {
         try {
-            const response = await fetch(`/api/tenant?slug=${slug}`);
+            const response = await fetch(`/api/tenant?slug=${slug}`, { cache: 'no-store' });
             if (response.ok) {
                 const data = await response.json();
                 const parsedConfig = typeof data.config === 'string' ? JSON.parse(data.config) : data.config;
