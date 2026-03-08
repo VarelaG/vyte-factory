@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { unstable_noStore as noStore } from 'next/cache';
 import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic'; // Prevent Vercel edge caching
@@ -15,6 +16,7 @@ export async function OPTIONS() {
 
 // GET /api/tenant?slug=...
 export async function GET(request: NextRequest) {
+    noStore(); // Force absolute dynamic execution on this specific route
     const { searchParams } = new URL(request.url);
     const slug = searchParams.get('slug');
 
