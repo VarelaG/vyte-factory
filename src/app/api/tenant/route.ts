@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+    return NextResponse.json({}, { headers: corsHeaders });
+}
+
 // GET /api/tenant?slug=...
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const slug = searchParams.get('slug');
 
     if (!slug) {
-        return NextResponse.json({ error: 'Falta parámetro slug' }, { status: 400 });
+        return NextResponse.json({ error: 'Falta parámetro slug' }, { status: 400, headers: corsHeaders });
     }
 
     try {
@@ -23,13 +33,13 @@ export async function GET(request: NextRequest) {
         });
 
         if (!tenant) {
-            return NextResponse.json({ error: 'Tenant no encontrado' }, { status: 404 });
+            return NextResponse.json({ error: 'Tenant no encontrado' }, { status: 404, headers: corsHeaders });
         }
 
-        return NextResponse.json(tenant);
+        return NextResponse.json(tenant, { headers: corsHeaders });
     } catch (error) {
         console.error('Error fetching tenant:', error);
-        return NextResponse.json({ error: 'Error interno' }, { status: 500 });
+        return NextResponse.json({ error: 'Error interno' }, { status: 500, headers: corsHeaders });
     }
 }
 
@@ -42,12 +52,12 @@ export async function POST(request: NextRequest) {
         const cookieSlug = request.cookies.get('vyte_session')?.value;
 
         if (!cliente_slug) {
-            return NextResponse.json({ error: 'slug requerido' }, { status: 400 });
+            return NextResponse.json({ error: 'slug requerido' }, { status: 400, headers: corsHeaders });
         }
 
         // Validar que exista sesión y que coincida con el tenant que se quiere modificar
         if (!cookieSlug || cookieSlug !== cliente_slug) {
-            return NextResponse.json({ error: 'No autorizado / Sesión inválida' }, { status: 401 });
+            return NextResponse.json({ error: 'No autorizado / Sesión inválida' }, { status: 401, headers: corsHeaders });
         }
 
         // Upsert: Si existe actualiza, si no, crea
@@ -59,9 +69,9 @@ export async function POST(request: NextRequest) {
             create: { cliente_slug, config: tenantStringifiedConfig }
         });
 
-        return NextResponse.json(tenant);
+        return NextResponse.json(tenant, { headers: corsHeaders });
     } catch (error) {
         console.error('Error saving tenant:', error);
-        return NextResponse.json({ error: 'Error interno' }, { status: 500 });
+        return NextResponse.json({ error: 'Error interno' }, { status: 500, headers: corsHeaders });
     }
 }
