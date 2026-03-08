@@ -14,7 +14,7 @@ model Tenant {
   cliente_slug String   @unique
   password     String?
   user_id      String?  // Optional para V1, si querés ligarlo a un único admin
-  config       String   @default("{}")
+  config       String   @db.LongText @default("{}")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
