@@ -28,21 +28,18 @@ export default function LoginPage() {
                 throw new Error(data.error || 'Credenciales inválidas');
             }
 
-            // Si es la cuenta principal de Vyte
             if (data.isMaster) {
                 router.push('/admin/master');
                 return;
             }
 
-            // El servidor seteó una cookie 'vyte_session'. 
-            // Opcional: guardamos un flag en localStorage por si es Admin entrando a un cliente viejo
             if (data.isDev) {
                 localStorage.setItem('vyte_dev_mode', 'true');
             } else {
                 localStorage.removeItem('vyte_dev_mode');
             }
 
-            router.push('/admin'); // Redirigimos al panel del cliente
+            router.push('/admin');
 
         } catch (err: any) {
             setError(err.message);
@@ -52,65 +49,70 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
-            <div className="w-full max-w-md bg-[#111] rounded-3xl shadow-2xl shadow-indigo-500/10 overflow-hidden border border-gray-800">
+        <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 selection:bg-white selection:text-black">
+            {/* Fondo decorativo minimalista */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-white/[0.02] rounded-full blur-[120px]" />
+            </div>
 
-                {/* Banner superior negro (Branding Vyte) */}
-                <div className="bg-black p-8 text-center relative overflow-hidden border-b border-gray-800">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-                    <h1 className="text-3xl font-black text-white tracking-tight">Vyte Factory</h1>
-                    <p className="text-gray-400 mt-2 text-sm font-medium">Headless Core CMS</p>
-                </div>
+            <div className="relative z-10 w-full max-w-md">
+                <div className="bg-[#0a0a0a] rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
 
-                {/* Formulario */}
-                <div className="p-8">
-                    <form onSubmit={handleLogin} className="space-y-6">
+                    {/* Encabezado */}
+                    <div className="p-12 text-center border-b border-white/5">
+                        <h1 className="text-2xl font-black text-white tracking-[0.3em] uppercase mb-2">
+                            Vyte <span className="font-thin text-zinc-500 italic">Factory</span>
+                        </h1>
+                        <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-medium">Panel de Acceso Seguro</p>
+                    </div>
 
-                        {error && (
-                            <div className="bg-red-950/50 text-red-500 p-3 rounded-xl border border-red-900/50 text-sm font-medium text-center animate-pulse">
-                                {error}
+                    {/* Formulario */}
+                    <div className="p-12">
+                        <form onSubmit={handleLogin} className="space-y-8">
+                            {error && (
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white text-xs font-bold text-center uppercase tracking-widest animate-pulse">
+                                    {error}
+                                </div>
+                            )}
+
+                            <div className="space-y-3">
+                                <label className="block text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500 ml-1">Cliente ID</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={slug}
+                                    onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                                    className="w-full px-6 py-5 bg-black border border-white/10 rounded-2xl focus:border-white outline-none transition-all font-bold text-white placeholder-zinc-800 tracking-wider text-sm"
+                                    placeholder="nombre-del-cliente"
+                                />
                             </div>
-                        )}
 
-                        <div>
-                            <label className="block text-sm font-bold text-gray-300 mb-2">Usuario (Cliente Slug)</label>
-                            <input
-                                type="text"
-                                required
-                                value={slug}
-                                onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                                className="w-full p-4 bg-black border border-gray-800 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-white placeholder-gray-600"
-                                placeholder="ej: peluqueria-marcos"
-                            />
-                        </div>
+                            <div className="space-y-3">
+                                <label className="block text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500 ml-1">Contraseña</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full px-6 py-5 bg-black border border-white/10 rounded-2xl focus:border-white outline-none transition-all font-bold text-white placeholder-zinc-800 tracking-[0.5em] text-sm"
+                                    placeholder="••••••••"
+                                />
+                            </div>
 
-                        <div>
-                            <label className="block text-sm font-bold text-gray-300 mb-2">Contraseña</label>
-                            <input
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-4 bg-black border border-gray-800 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium tracking-widest text-white placeholder-gray-600"
-                                placeholder="••••••••"
-                            />
-                        </div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-5 bg-white text-black font-black rounded-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:shadow-white/20 disabled:opacity-50 disabled:scale-100"
+                            >
+                                {loading ? 'Autenticando...' : 'Iniciar Sesión'}
+                            </button>
+                        </form>
 
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full p-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-all shadow-lg shadow-white/10 hover:shadow-xl active:scale-95 disabled:opacity-50 disabled:scale-100"
-                        >
-                            {loading ? 'Validando Acceso...' : 'Ingresar a mi Panel'}
-                        </button>
-
-                    </form>
-
-                    <p className="text-center text-xs text-gray-600 mt-8 font-medium">
-                        Desarrollado con 🖤 por Vyte. Todos los derechos reservados.
-                    </p>
+                        <p className="text-center text-[8px] text-zinc-700 mt-12 font-bold tracking-[0.4em] uppercase">
+                            Vyte Tech Group — All rights reserved
+                        </p>
+                    </div>
                 </div>
-
             </div>
         </div>
     );
