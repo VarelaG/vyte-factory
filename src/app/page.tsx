@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Zap, Shield, Sparkles, Layout, Globe, ArrowRight } from "lucide-react";
 
