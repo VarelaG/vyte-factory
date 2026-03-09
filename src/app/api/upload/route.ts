@@ -21,8 +21,11 @@ export async function POST(request: Request): Promise<NextResponse> {
         });
 
         return NextResponse.json({ success: true, url: blob.url });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Upload Error:', error);
-        return NextResponse.json({ error: 'Error al subir la imagen a la nube' }, { status: 500 });
+        return NextResponse.json({
+            error: 'Error en el servidor de Vercel Blob',
+            details: error.message
+        }, { status: 500 });
     }
 }

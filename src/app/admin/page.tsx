@@ -111,11 +111,14 @@ export default function AdminDashboard() {
                 body: formData
             });
 
-            if (!res.ok) throw new Error('Error subiendo imagen');
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.details || errorData.error || 'Error desconocido');
+            }
             const { url } = await res.json();
             updateFieldValue(fieldId, url);
-        } catch (err) {
-            alert("Error local al subir foto.");
+        } catch (err: any) {
+            alert("Error al subir foto: " + err.message);
         }
     };
 
