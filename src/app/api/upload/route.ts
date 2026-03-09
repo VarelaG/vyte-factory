@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { put } from '@vercel/blob';
+import { NextResponse } from 'next/server';
 
-// Endpoint para subir imágenes locales
-export async function POST(request: NextRequest) {
+export async function POST(request: Request): Promise<NextResponse> {
+    const { searchParams } = new URL(request.url);
+    const filename = searchParams.get('filename');
+
     try {
         const data = await request.formData();
         const file = data.get('file') as File | null;
@@ -13,29 +14,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Falta el archivo o el slug' }, { status: 400 });
         }
 
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
+        // Subir a Vercel Blob
+        // Agregamos el slug como prefijo en el nombre para mantener orden
+        const blob = await put(`uploads/${slug}/${Date.now()}-${file.name}`, file, {
+            access: 'public',
+        });
 
-        // Carpeta donde guardar: public/uploads/slug/
-        // hostinger public_html mapeará a la carpeta ./out o el dist default.
-        const uploadDir = join(process.cwd(), 'public', 'uploads', slug);
-
-        // Crear el directorio si no existe
-        await mkdir(uploadDir, { recursive: true });
-
-        // Nombre único para que no pise fotos
-        const uniqueName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-        const filePath = join(uploadDir, uniqueName);
-
-        await writeFile(filePath, buffer);
-
-        // La URL pública que el frontend usará para mostrar la imagen (~/uploads/slug/nombre.jpg)
-        const publicUrl = `/uploads/${slug}/${uniqueName}`;
-
-        return NextResponse.json({ success: true, url: publicUrl });
-
+        return NextResponse.json({ success: true, url: blob.url });
     } catch (error) {
         console.error('Upload Error:', error);
-        return NextResponse.json({ error: 'Error al subir la imagen' }, { status: 500 });
+        return NextResponse.json({ error: 'Error al subir la imagen a la nube' }, { status: 500 });
     }
 }
