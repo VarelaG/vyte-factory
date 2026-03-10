@@ -417,7 +417,7 @@ export default function AdminDashboard() {
                                                     <div className="flex flex-col gap-4">
                                                         {field.value ? (
                                                             <div className="relative rounded-[2rem] overflow-hidden border border-white/5 aspect-square md:aspect-video w-full bg-[#050505] flex items-center justify-center group/img">
-                                                                <img src={field.value} alt={field.label} className="w-full h-full object-cover transition-all group-hover/img:scale-110 duration-700 grayscale hover:grayscale-0" />
+                                                                <img src={field.value} alt={field.label} className="w-full h-full object-cover transition-all group-hover/img:scale-110 duration-700" />
                                                                 <div className="absolute inset-0 bg-black/80 opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center backdrop-blur-md">
                                                                     <div className="flex flex-col items-center gap-3">
                                                                         <Upload className="w-6 h-6 text-white" />
@@ -470,7 +470,7 @@ export default function AdminDashboard() {
                                                                     />
                                                                     <div className="relative h-32 rounded-2xl overflow-hidden border border-white/5 bg-zinc-950 flex flex-col items-center justify-center group/subimg">
                                                                         {item.values.image ? (
-                                                                            <img src={item.values.image} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all" />
+                                                                            <img src={item.values.image} className="w-full h-full object-cover transition-all" />
                                                                         ) : (
                                                                             <ImageIcon className="w-6 h-6 text-zinc-800" />
                                                                         )}

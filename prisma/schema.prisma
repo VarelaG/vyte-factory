@@ -15,6 +15,7 @@ model Tenant {
   password     String?
   user_id      String?  // Optional para V1, si querés ligarlo a un único admin
   config       String   @db.LongText @default("{}")
+  website_url  String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

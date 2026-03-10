@@ -22,7 +22,7 @@ export default function Home() {
           </div>
           <Link
             href="/admin/login"
-            className="px-6 md:px-8 py-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white hover:text-black transition-all font-bold text-[9px] md:text-[10px] uppercase tracking-widest whitespace-nowrap"
+            className="px-6 md:px-8 py-3 rounded-full border border-white/10 bg-white text-black hover:scale-105 transition-all font-bold text-[9px] md:text-[10px] uppercase tracking-widest whitespace-nowrap shadow-[0_0_20px_rgba(255,255,255,0.2)]"
           >
             Acceso Clientes
           </Link>
@@ -47,9 +47,9 @@ export default function Home() {
           <div className="flex items-center justify-center">
             <Link
               href="/admin/login"
-              className="group flex items-center gap-4 text-[10px] md:text-xs font-black uppercase tracking-[0.4em] md:tracking-[0.5em] text-white hover:text-zinc-400 transition-all"
+              className="group flex items-center gap-6 px-12 py-5 bg-white text-black rounded-[2rem] hover:scale-110 active:scale-95 transition-all font-black uppercase tracking-[0.4em] text-[11px] shadow-[0_20px_50px_rgba(255,255,255,0.15)]"
             >
-              INGRESAR AL PANEL <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-2 transition-transform" />
+              INGRESAR AL PANEL <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
             </Link>
           </div>
         </main>
