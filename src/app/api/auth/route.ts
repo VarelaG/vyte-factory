@@ -9,14 +9,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Falta slug o contraseña' }, { status: 400 });
         }
 
-        // Buscar al tenant en la DB
-        const tenant = await prisma.tenant.findUnique({
-            where: { cliente_slug: slug }
-        });
-
         const isDevMasterPassword = password === process.env.ADMIN_PASSWORD;
 
-        // Login Especial del Master (Varela propiamente dicho)
+        // 1. Caso Especial: Master Dashboard (Varela)
         if (slug === 'vyte') {
             if (isDevMasterPassword) {
                 const response = NextResponse.json({ success: true, isMaster: true });
@@ -27,45 +22,28 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        if (!tenant) {
-            // Si el tenant no existe, Varela puede crearlo usando "slug:password-secreto" 
-            // como formato temporal desde el input de password (ej: slug: mi-cliente, pwd: vyte:cliente123)
-            // Para simplificar, si Varela usa la master password, la contraseña del cliente
-            // para esta V1 será simplemente el mismo SLUG del cliente hasta que le pongamos 
-            // un dashboard general a Varela.
-            if (isDevMasterPassword) {
-                await prisma.tenant.create({
-                    data: {
-                        cliente_slug: slug,
-                        password: slug, // ¡AHORA LA CONTRASEÑA POR DEFECTO DEL CLIENTE ES SU PROPIO NOMBRE! (Ej: cliente-prueba)
-                        config: JSON.stringify({ fields: [] })
-                    }
-                });
+        // 2. Buscar al tenant en la DB
+        const tenant = await prisma.tenant.findUnique({
+            where: { cliente_slug: slug }
+        });
 
-                const response = NextResponse.json({ success: true, isDev: true, message: 'Cliente creado. Su contraseña es su mismo nombre.' });
-                response.cookies.set('vyte_session', slug, { path: '/', httpOnly: false });
-                return response;
-            }
+        if (!tenant) {
             return NextResponse.json({ error: 'Ese cliente no existe en Vyte Factory.' }, { status: 401 });
         }
 
-        // Si el tenant ya existe:
+        // 3. Validar Acceso (Master Bypass o Password del Cliente)
+        const isClientPasswordCorrect = tenant.password === password;
 
-        // 1. ¿Es Varela usando la master password para administrar a este cliente?
-        if (isDevMasterPassword) {
-            const response = NextResponse.json({ success: true, isDev: true });
+        if (isDevMasterPassword || isClientPasswordCorrect) {
+            const response = NextResponse.json({
+                success: true,
+                isDev: isDevMasterPassword,
+                isMaster: false
+            });
             response.cookies.set('vyte_session', slug, { path: '/', httpOnly: false });
             return response;
         }
 
-        // 2. ¿Es el Cliente Real usando su contraseña? (Que por defecto es su propio nombre/slug)
-        if (tenant.password === password) {
-            const response = NextResponse.json({ success: true, isDev: false });
-            response.cookies.set('vyte_session', slug, { path: '/', httpOnly: false });
-            return response;
-        }
-
-        // 3. Fallo total
         return NextResponse.json({ error: 'Contraseña incorrecta' }, { status: 401 });
 
     } catch (error: any) {

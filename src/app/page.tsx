@@ -34,9 +34,9 @@ export default function Home() {
             <Sparkles className="w-3 h-3 text-white animate-pulse" /> CMS Headless de Alto Rendimiento
           </div>
 
-          <h1 className="text-5xl sm:text-7xl md:text-[9rem] lg:text-[10rem] font-black tracking-tighter mb-8 md:mb-10 leading-[0.9] md:leading-[0.8] uppercase italic max-w-[90vw]">
-            GESTIONA TU SITIO <br />
-            <span className="text-zinc-600">EN TIEMPO REAL</span>
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black italic text-white leading-[0.9] tracking-tighter uppercase mb-2 text-center drop-shadow-2xl">
+            Gestiona tu sitio <br className="hidden md:block" />
+            <span className="text-zinc-600 block md:inline">en tiempo real</span>
           </h1>
 
           <p className="text-zinc-500 text-sm md:text-lg lg:text-xl max-w-xl mx-auto mb-12 md:mb-16 leading-relaxed font-light tracking-wide px-4">
