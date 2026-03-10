@@ -150,80 +150,98 @@ export default function AdminDashboard() {
     if (!tenantSlug) return null;
 
     return (
-        <div className="flex h-screen bg-[#050505] text-white font-sans overflow-hidden">
+        <div className="flex flex-col md:flex-row h-screen bg-[#050505] text-zinc-100 font-sans overflow-hidden">
 
-            {/* SIDEBAR CLIENTE */}
-            <aside className="w-64 border-r border-[#1a1a1a] bg-[#0a0a0a] flex flex-col hidden md:flex">
-                <div className="p-6 border-b border-[#1a1a1a]">
+            {/* HEADER MÓVIL (Solo visible en celulares) */}
+            <header className="md:hidden flex items-center justify-between px-6 py-4 bg-[#0a0a0a] border-b border-white/5 z-50">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-black font-black text-sm">
+                        {tenantSlug.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-sm font-black uppercase tracking-widest truncate max-w-[120px]">{tenantSlug}</span>
+                </div>
+                <button
+                    onClick={handleLogout}
+                    className="p-2 rounded-full bg-white/5 text-zinc-500 hover:text-white transition-colors"
+                >
+                    <LogOut className="w-5 h-5" />
+                </button>
+            </header>
+
+            {/* SIDEBAR (Escritorio) */}
+            <aside className="w-64 border-r border-white/5 bg-[#0a0a0a] flex flex-col hidden md:flex">
+                <div className="p-8 border-b border-white/5">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-black font-black text-xl shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                             {tenantSlug.charAt(0).toUpperCase()}
                         </div>
                         <div className="overflow-hidden">
-                            <h1 className="text-lg font-bold tracking-tight text-white leading-none truncate">{tenantSlug}</h1>
-                            <span className="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Client Space</span>
+                            <h1 className="text-lg font-black tracking-tight text-white leading-none truncate uppercase">{tenantSlug}</h1>
+                            <span className="text-[9px] font-black text-zinc-600 tracking-[0.2em] uppercase">Espacio Cliente</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="px-4 py-6 flex-1">
+                <div className="px-4 py-8 flex-1">
                     <nav className="space-y-1">
-                        <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 text-white font-medium border border-white/10">
-                            <LayoutDashboard className="w-5 h-5 text-indigo-400" />
+                        <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 text-white font-bold border border-white/10 text-xs uppercase tracking-widest">
+                            <LayoutDashboard className="w-4 h-4" />
                             Gestión Web
                         </a>
-                        <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white font-medium transition-colors">
-                            <Settings className="w-5 h-5" />
-                            Ajustes Avanzados
+                        <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-zinc-500 hover:text-white font-bold transition-colors text-xs uppercase tracking-widest">
+                            <Settings className="w-4 h-4" />
+                            Ajustes
                         </a>
                     </nav>
 
                     {isDevUser && (
-                        <div className="mt-8 border-t border-[#1a1a1a] pt-6">
-                            <p className="px-4 text-[10px] font-black tracking-widest uppercase text-indigo-500 mb-2">Vyte Tools</p>
+                        <div className="mt-10 border-t border-white/5 pt-8">
+                            <p className="px-4 text-[9px] font-black tracking-[0.3em] uppercase text-zinc-600 mb-4">Vyte Dev Tools</p>
                             <button
                                 onClick={() => setDevMode(!devMode)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${devMode ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'hover:bg-white/5 text-gray-400 hover:text-white border border-transparent'}`}
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all text-xs uppercase tracking-widest ${devMode ? 'bg-white text-black border border-white' : 'hover:bg-white/5 text-zinc-500 hover:text-white border border-transparent'}`}
                             >
-                                <Terminal className="w-5 h-5" />
-                                {devMode ? 'Modo Dev Activo' : 'Activar Modo Dev'}
+                                <Terminal className="w-4 h-4" />
+                                {devMode ? 'Modo Dev On' : 'Modo Dev Off'}
                             </button>
                         </div>
                     )}
                 </div>
 
-                <div className="p-4 border-t border-[#1a1a1a]">
+                <div className="p-6 border-t border-white/5">
                     <button
                         onClick={handleLogout}
-                        className="flex w-full items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 text-gray-400 hover:text-red-400 font-medium transition-colors"
+                        className="flex w-full items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-zinc-600 hover:text-white font-bold transition-all text-xs uppercase tracking-widest"
                     >
-                        <LogOut className="w-5 h-5" />
+                        <LogOut className="w-4 h-4" />
                         Cerrar Sesión
                     </button>
                 </div>
             </aside>
 
             {/* MAIN CONTENT */}
-            <main className="flex-1 overflow-y-auto w-full relative">
-                {/* Decoration */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/5 rounded-full blur-[120px] pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
+            <main className="flex-1 overflow-y-auto w-full relative h-[calc(100vh-64px)] md:h-screen">
+                {/* Decoración Minimalista */}
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/[0.02] rounded-full blur-[150px] pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
 
-                <div className="max-w-5xl mx-auto p-6 md:p-10 relative z-10">
+                <div className="max-w-6xl mx-auto p-6 md:p-12 lg:p-16 relative z-10">
 
                     {/* TOP HEADER */}
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 bg-[#111]/80 backdrop-blur-md p-6 rounded-3xl border border-[#222] shadow-sm">
+                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-12">
                         <div>
-                            <h2 className="text-2xl font-black mb-1 flex items-center gap-2 text-white">
-                                Modelador Visual
+                            <div className="flex items-center gap-3 mb-2">
+                                <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[9px] font-black uppercase tracking-[0.3em] text-zinc-500">Live Editor</span>
+                            </div>
+                            <h2 className="text-4xl md:text-5xl font-black text-white italic uppercase tracking-tighter">
+                                Modelador <span className="text-zinc-600">Visual</span>
                             </h2>
-                            <p className="text-sm text-gray-400">Actualizá el contenido de tu web en tiempo real.</p>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex gap-4 w-full h-full lg:w-auto">
                             {isDevUser && (
                                 <button
                                     onClick={() => loadTenantData(tenantSlug)}
-                                    className="px-4 py-2.5 bg-[#111] border border-[#333] text-white rounded-xl hover:bg-[#222] transition shadow-sm flex items-center justify-center"
-                                    title="Recargar de BD"
+                                    className="p-4 bg-zinc-900 border border-white/5 text-zinc-400 rounded-2xl hover:text-white transition-all active:scale-95"
+                                    title="Sincronizar"
                                 >
                                     <RefreshCw className="w-5 h-5" />
                                 </button>
@@ -231,12 +249,12 @@ export default function AdminDashboard() {
                             <button
                                 onClick={handleSave}
                                 disabled={saving || loading}
-                                className="px-6 py-2.5 bg-white text-black rounded-xl hover:bg-gray-200 transition font-black shadow-lg shadow-white/10 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 min-w-[180px]"
+                                className="flex-1 lg:flex-none px-10 py-4 bg-white text-black rounded-2xl hover:scale-105 transition-all font-black uppercase tracking-widest text-[11px] shadow-[0_10px_30px_rgba(255,255,255,0.1)] active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
                             >
                                 {saving ? (
                                     <>
                                         <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                                        Publicando...
+                                        Publicando
                                     </>
                                 ) : (
                                     <>
@@ -249,82 +267,101 @@ export default function AdminDashboard() {
 
                     {/* ÁREA DE TRABAJO */}
                     {loading ? (
-                        <div className="text-center py-20 flex flex-col items-center gap-4">
-                            <div className="w-10 h-10 border-4 border-[#222] border-t-indigo-500 rounded-full animate-spin"></div>
-                            <p className="text-gray-500 font-medium text-sm">Cargando módulos de diseño...</p>
+                        <div className="text-center py-32 flex flex-col items-center gap-6">
+                            <div className="w-12 h-12 border-4 border-zinc-800 border-t-white rounded-full animate-spin"></div>
+                            <p className="text-zinc-600 font-bold text-[10px] uppercase tracking-[0.4em]">Sincronizando Módulos...</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 gap-8">
+                        <div className="space-y-12">
 
-                            {/* EDITOR DE CONFIG (CLIENTE) */}
+                            {/* EDITOR DE CAMPOS */}
                             {config.fields.length === 0 ? (
-                                <div className="text-center py-16 px-6 rounded-3xl bg-[#0a0a0a] border border-dashed border-[#333]">
-                                    <LayoutDashboard className="w-12 h-12 text-gray-700 mx-auto mb-4" />
-                                    <p className="text-white font-medium mb-1">Tu diseño modular todavía no tiene campos habilitados.</p>
-                                    <p className="text-sm text-gray-500">Si sos administrador Vyte, activá el modo Dev para inyectar bloques.</p>
+                                <div className="text-center py-24 px-10 rounded-[3rem] bg-white/[0.01] border border-dashed border-white/10">
+                                    <LayoutDashboard className="w-16 h-16 text-zinc-800 mx-auto mb-6" />
+                                    <p className="text-zinc-400 font-bold mb-2 uppercase tracking-widest">Sin campos habilitados</p>
+                                    <p className="text-[10px] text-zinc-700 font-black uppercase tracking-[0.2em]">Activa el modo dev para configurar este espacio.</p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                                     {config.fields.map(field => (
-                                        <div key={field.id} className="relative flex flex-col group p-6 bg-[#0f0f0f] rounded-2xl border border-[#222] shadow-sm hover:border-[#444] transition-colors duration-300">
+                                        <div key={field.id} className="relative flex flex-col group p-8 bg-[#0a0a0a] rounded-[2.5rem] border border-white/5 hover:border-white/20 transition-all duration-500 shadow-sm overflow-hidden">
 
-                                            {/* Etiqueta del campo */}
-                                            <label className="flex items-center gap-2 text-sm font-bold text-gray-300 mb-4">
-                                                {field.type === 'text' && <Type className="w-4 h-4 text-gray-500" />}
-                                                {field.type === 'textarea' && <AlignLeft className="w-4 h-4 text-gray-500" />}
-                                                {field.type === 'image' && <ImageIcon className="w-4 h-4 text-gray-500" />}
-                                                {field.label}
-                                            </label>
+                                            {/* Fondo abstracto por tarjeta */}
+                                            <div className="absolute top-0 right-0 w-24 h-24 bg-white/[0.02] rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/[0.05] transition-colors"></div>
 
-                                            {field.type === 'text' && (
-                                                <input
-                                                    type="text"
-                                                    value={field.value}
-                                                    onChange={(e) => updateFieldValue(field.id, e.target.value)}
-                                                    className="w-full p-4 bg-[#050505] border border-[#222] rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium transition-all text-white placeholder-gray-600"
-                                                    placeholder={`Ingresa ${field.label.toLowerCase()}`}
-                                                />
-                                            )}
-
-                                            {field.type === 'textarea' && (
-                                                <textarea
-                                                    rows={4}
-                                                    value={field.value}
-                                                    onChange={(e) => updateFieldValue(field.id, e.target.value)}
-                                                    className="w-full p-4 bg-[#050505] border border-[#222] rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium transition-all text-white placeholder-gray-600 resize-y"
-                                                    placeholder={`Ingresa texto para ${field.label.toLowerCase()}`}
-                                                />
-                                            )}
-
-                                            {field.type === 'image' && (
-                                                <div className="flex flex-col gap-4">
-                                                    {field.value ? (
-                                                        <div className="relative rounded-xl overflow-hidden border border-[#222] aspect-video w-full bg-[#050505] flex items-center justify-center group/img">
-                                                            <img src={field.value} alt={field.label} className="w-full h-full object-cover transition-transform group-hover/img:scale-105 duration-500" />
-                                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                                                                <span className="text-white font-bold flex items-center gap-2"><Upload className="w-4 h-4" /> Cambiar</span>
-                                                            </div>
-                                                            <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], field.id)} />
-                                                        </div>
-                                                    ) : (
-                                                        <div className="relative w-full aspect-video bg-[#050505] hover:bg-[#111] transition-colors rounded-xl flex flex-col items-center justify-center text-gray-500 text-sm font-medium border border-dashed border-[#333] group/upload">
-                                                            <Upload className="w-6 h-6 mb-2 text-gray-600 group-hover/upload:text-indigo-400 transition-colors" />
-                                                            Click para subir imagen
-                                                            <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], field.id)} />
-                                                        </div>
-                                                    )}
+                                            {/* Etiqueta */}
+                                            <div className="flex items-center justify-between mb-8">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2.5 rounded-xl bg-white/5 text-zinc-500">
+                                                        {field.type === 'text' && <Type className="w-4 h-4" />}
+                                                        {field.type === 'textarea' && <AlignLeft className="w-4 h-4" />}
+                                                        {field.type === 'image' && <ImageIcon className="w-4 h-4" />}
+                                                    </div>
+                                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{field.label}</span>
                                                 </div>
-                                            )}
 
-                                            {/* Botón Borrar en Modo Dev */}
+                                                {devMode && (
+                                                    <button
+                                                        onClick={() => removeField(field.id)}
+                                                        className="p-2 rounded-lg text-zinc-800 hover:text-red-500 transition-colors"
+                                                        title="Eliminar Bloque"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            <div className="relative">
+                                                {field.type === 'text' && (
+                                                    <input
+                                                        type="text"
+                                                        value={field.value}
+                                                        onChange={(e) => updateFieldValue(field.id, e.target.value)}
+                                                        className="w-full px-6 py-5 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white/30 font-bold transition-all text-white placeholder-zinc-800 text-sm tracking-wide"
+                                                        placeholder={`Ingresa ${field.label.toLowerCase()}...`}
+                                                    />
+                                                )}
+
+                                                {field.type === 'textarea' && (
+                                                    <textarea
+                                                        rows={5}
+                                                        value={field.value}
+                                                        onChange={(e) => updateFieldValue(field.id, e.target.value)}
+                                                        className="w-full px-6 py-5 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white/30 font-bold transition-all text-white placeholder-zinc-800 resize-none text-sm leading-relaxed"
+                                                        placeholder={`Ingresa contenido...`}
+                                                    />
+                                                )}
+
+                                                {field.type === 'image' && (
+                                                    <div className="flex flex-col gap-4">
+                                                        {field.value ? (
+                                                            <div className="relative rounded-[2rem] overflow-hidden border border-white/5 aspect-square md:aspect-video w-full bg-[#050505] flex items-center justify-center group/img">
+                                                                <img src={field.value} alt={field.label} className="w-full h-full object-cover transition-all group-hover/img:scale-110 duration-700 grayscale hover:grayscale-0" />
+                                                                <div className="absolute inset-0 bg-black/80 opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center backdrop-blur-md">
+                                                                    <div className="flex flex-col items-center gap-3">
+                                                                        <Upload className="w-6 h-6 text-white" />
+                                                                        <span className="text-[10px] text-white font-black uppercase tracking-widest">Cambiar Imagen</span>
+                                                                    </div>
+                                                                </div>
+                                                                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], field.id)} />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="relative w-full aspect-video bg-[#050505] hover:bg-zinc-900 transition-all rounded-[2rem] flex flex-col items-center justify-center text-zinc-700 text-[10px] font-black uppercase tracking-widest border border-dashed border-white/10 group/upload">
+                                                                <Upload className="w-8 h-8 mb-4 text-zinc-800 group-hover/upload:text-white transition-colors" />
+                                                                Subir Archivo
+                                                                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], field.id)} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* ID Badge (Modo Dev) */}
                                             {devMode && (
-                                                <button
-                                                    onClick={() => removeField(field.id)}
-                                                    className="absolute -top-3 -right-3 bg-red-500 text-white w-8 h-8 rounded-full shadow-lg border border-red-600 text-xs font-black transition-transform scale-0 group-hover:scale-100 hover:bg-red-400 flex items-center justify-center z-10"
-                                                    title="Eliminar Bloque"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                                                <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between">
+                                                    <span className="text-[8px] font-black text-zinc-700 uppercase tracking-widest">{field.id}</span>
+                                                    <span className="text-[8px] font-black text-zinc-700 uppercase tracking-widest">{field.type}</span>
+                                                </div>
                                             )}
                                         </div>
                                     ))}
@@ -333,54 +370,54 @@ export default function AdminDashboard() {
 
                             {/* MODO DEV - INYECTOR DE BLOQUES */}
                             {devMode && (
-                                <div className="bg-indigo-950/20 p-8 rounded-3xl border border-indigo-500/20 mt-10 relative shadow-2xl overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-purple-500"></div>
+                                <div className="bg-white/[0.02] p-10 md:p-16 rounded-[4rem] border border-white/10 relative shadow-2xl overflow-hidden mt-20">
+                                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/[0.03] rounded-full blur-[100px] pointer-events-none"></div>
 
-                                    <div className="flex items-center gap-3 mb-8">
-                                        <div className="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-500/20">
-                                            <Terminal className="w-5 h-5" />
+                                    <div className="flex items-center gap-4 mb-12">
+                                        <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-black font-black shadow-2xl">
+                                            <Terminal className="w-7 h-7" />
                                         </div>
                                         <div>
-                                            <h2 className="text-xl font-black text-white leading-tight">Vyte Injector</h2>
-                                            <p className="text-xs text-indigo-400 font-bold tracking-widest uppercase mt-0.5">Creación de Esquema CMS</p>
+                                            <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter">Vyte <span className="text-zinc-600 font-thin not-italic">Injector</span></h2>
+                                            <p className="text-[9px] text-zinc-500 font-black tracking-[0.4em] uppercase mt-1">Estructura del Satélite</p>
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-[#050505] p-6 rounded-2xl border border-indigo-500/10 shadow-inner">
-                                        <div className="md:col-span-1">
-                                            <label className="block text-[10px] font-black tracking-widest uppercase text-gray-500 mb-2">Tipo de Input</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+                                        <div>
+                                            <label className="block text-[9px] font-black tracking-[0.3em] uppercase text-zinc-500 mb-3 ml-2">Tipo de Entrada</label>
                                             <select
                                                 value={newField.type}
                                                 onChange={(e) => setNewField({ ...newField, type: e.target.value as FieldType })}
-                                                className="w-full p-3.5 bg-[#111] border border-[#222] rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-bold text-gray-300 cursor-pointer appearance-none"
+                                                className="w-full px-6 py-4 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white transition-all font-bold text-zinc-300 cursor-pointer appearance-none text-xs uppercase"
                                             >
-                                                <option value="text">Texto Corto (Títulos)</option>
-                                                <option value="textarea">Texto Largo (Párrafos)</option>
-                                                <option value="image">Imagen (Fotos, Logos)</option>
+                                                <option value="text">Texto Corto</option>
+                                                <option value="textarea">Texto Largo</option>
+                                                <option value="image">Imagen</option>
                                             </select>
                                         </div>
-                                        <div className="md:col-span-1">
-                                            <label className="block text-[10px] font-black tracking-widest uppercase text-gray-500 mb-2">ID en Código</label>
+                                        <div>
+                                            <label className="block text-[9px] font-black tracking-[0.3em] uppercase text-zinc-500 mb-3 ml-2">Identificador (ID)</label>
                                             <input
-                                                type="text" placeholder="ej: titulo_hero"
+                                                type="text" placeholder="ej: titulo_seo"
                                                 value={newField.id} onChange={(e) => setNewField({ ...newField, id: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
-                                                className="w-full p-3.5 bg-[#111] border border-[#222] rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-bold text-indigo-400 placeholder-gray-700"
+                                                className="w-full px-6 py-4 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white transition-all font-bold text-white placeholder-zinc-800 text-xs"
                                             />
                                         </div>
-                                        <div className="md:col-span-1">
-                                            <label className="block text-[10px] font-black tracking-widest uppercase text-gray-500 mb-2">Nombre Visual</label>
+                                        <div>
+                                            <label className="block text-[9px] font-black tracking-[0.3em] uppercase text-zinc-500 mb-3 ml-2">Etiqueta Visual</label>
                                             <input
-                                                type="text" placeholder="Título Portada principal"
+                                                type="text" placeholder="ej: Título Portada"
                                                 value={newField.label} onChange={(e) => setNewField({ ...newField, label: e.target.value })}
-                                                className="w-full p-3.5 bg-[#111] border border-[#222] rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-bold text-white placeholder-gray-700"
+                                                className="w-full px-6 py-4 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white transition-all font-bold text-white placeholder-zinc-800 text-xs"
                                             />
                                         </div>
-                                        <div className="md:col-span-1">
+                                        <div>
                                             <button
                                                 onClick={addNewField}
-                                                className="w-full p-3.5 bg-indigo-600 text-white font-black rounded-xl hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center justify-center gap-2 border border-indigo-500"
+                                                className="w-full py-4 bg-white text-black font-black rounded-2xl hover:scale-105 transition-all text-[11px] uppercase tracking-widest shadow-xl active:scale-95 border border-white"
                                             >
-                                                <Plus className="w-5 h-5" /> Inyectar Bloque
+                                                <Plus className="w-5 h-5 mx-auto" />
                                             </button>
                                         </div>
                                     </div>
@@ -390,6 +427,11 @@ export default function AdminDashboard() {
                         </div>
                     )}
                 </div>
+
+                {/* Footer del Main */}
+                <footer className="px-12 py-12 text-center text-zinc-800 text-[8px] font-black tracking-[0.5em] uppercase border-t border-white/[0.02]">
+                    Vyte Factory — Beyond Digital Limits
+                </footer>
             </main>
         </div>
     );
