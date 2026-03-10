@@ -4,9 +4,11 @@ import prisma from '@/lib/prisma';
 // API para Vyte Master Dashboard
 export async function GET(request: NextRequest) {
     try {
-        // En V1, confiamos que el Master llego aca, o podemos leer la cookie vyte_master_session si existiera
         const cookie = request.cookies.get('vyte_master_session');
-        if (!cookie || cookie.value !== 'true') {
+        const masterPass = request.headers.get('x-master-password');
+        const isMaster = cookie?.value === 'true' || masterPass === process.env.ADMIN_PASSWORD;
+
+        if (!isMaster) {
             return NextResponse.json({ error: 'Acceso Denegado' }, { status: 401 });
         }
 
@@ -32,7 +34,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const cookie = request.cookies.get('vyte_master_session');
-        if (!cookie || cookie.value !== 'true') {
+        const masterPass = request.headers.get('x-master-password');
+        const isMaster = cookie?.value === 'true' || masterPass === process.env.ADMIN_PASSWORD;
+
+        if (!isMaster) {
             return NextResponse.json({ error: 'Acceso Denegado' }, { status: 401 });
         }
 
@@ -68,7 +73,10 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
     try {
         const cookie = request.cookies.get('vyte_master_session');
-        if (!cookie || cookie.value !== 'true') {
+        const masterPass = request.headers.get('x-master-password');
+        const isMaster = cookie?.value === 'true' || masterPass === process.env.ADMIN_PASSWORD;
+
+        if (!isMaster) {
             return NextResponse.json({ error: 'Acceso Denegado' }, { status: 401 });
         }
 

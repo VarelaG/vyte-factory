@@ -15,7 +15,12 @@ export async function POST(request: NextRequest) {
         if (slug === 'vyte') {
             if (isDevMasterPassword) {
                 const response = NextResponse.json({ success: true, isMaster: true });
-                response.cookies.set('vyte_master_session', 'true', { path: '/', httpOnly: false });
+                response.cookies.set('vyte_master_session', 'true', {
+                    path: '/',
+                    httpOnly: false,
+                    secure: false, // Permitir en localhost
+                    sameSite: 'lax'
+                });
                 return response;
             } else {
                 return NextResponse.json({ error: 'Contraseña maestra incorrecta' }, { status: 401 });

@@ -220,7 +220,7 @@ export default function AdminDashboard() {
     if (!tenantSlug) return null;
 
     return (
-        <div className="flex flex-col md:flex-row h-screen bg-[#050505] text-zinc-100 font-sans overflow-x-hidden md:overflow-hidden">
+        <div className="flex flex-col md:flex-row h-screen bg-[#050505] text-zinc-100 font-sans overflow-hidden">
 
             {/* HEADER MÓVIL (Solo visible en celulares) */}
             <header className="md:hidden flex items-center justify-between px-6 py-4 bg-[#0a0a0a] border-b border-white/5 z-50">

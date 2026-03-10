@@ -164,9 +164,9 @@ export default function MasterDashboard() {
             </aside>
 
             {/* MAIN CONTENT */}
-            <main className="flex-1 overflow-y-auto w-full relative h-[calc(100vh-64px)] md:h-screen">
+            <main className="flex-1 overflow-y-auto overflow-x-hidden w-full relative h-[calc(100vh-64px)] md:h-screen">
                 {/* Decoración */}
-                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white/[0.01] rounded-full blur-[150px] pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
+                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white/[0.01] rounded-full blur-[150px] pointer-events-none -translate-y-1/2 translate-x-1/2 max-w-full"></div>
 
                 <div className="max-w-7xl mx-auto p-6 md:p-12 lg:p-16 relative z-10">
 
