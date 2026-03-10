@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, Settings, LogOut, Plus, Search, Building2, Globe, MoreVertical, ShieldCheck, Zap } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, LogOut, Plus, Search, Building2, Globe, MoreVertical, ShieldCheck, Zap, Trash2 } from 'lucide-react';
 
 interface Tenant {
     id: string;
@@ -68,6 +68,24 @@ export default function MasterDashboard() {
             setError(err.message);
         } finally {
             setCreating(false);
+        }
+    };
+
+    const handleDeleteTenant = async (slug: string) => {
+        if (!confirm(`¿Estás seguro de que querés ELIMINAR permanentemente a "${slug}"? Esta acción no se puede deshacer.`)) return;
+
+        try {
+            const res = await fetch(`/api/master/tenants?slug=${slug}`, {
+                method: 'DELETE'
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Error al eliminar');
+
+            // Actualizamos la lista localmente
+            setTenants(prev => prev.filter(t => t.cliente_slug !== slug));
+        } catch (err: any) {
+            alert("Error: " + err.message);
         }
     };
 
@@ -272,15 +290,19 @@ export default function MasterDashboard() {
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-4 pt-4 md:pt-0 border-t border-white/5 md:border-0">
+                                            <div className="flex items-center gap-3 pt-4 md:pt-0 border-t border-white/5 md:border-0">
                                                 <button
                                                     onClick={() => handleDesignWeb(tenant.cliente_slug)}
                                                     className="flex-1 md:flex-none px-6 py-4 bg-zinc-900 border border-white/5 text-zinc-400 hover:text-white hover:border-white/20 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
                                                 >
-                                                    <Settings className="w-4 h-4" /> Entrar a Factoría
+                                                    <Settings className="w-4 h-4" /> Entrar
                                                 </button>
-                                                <button className="p-4 bg-zinc-950 text-zinc-800 hover:text-white rounded-xl transition-colors">
-                                                    <MoreVertical className="w-5 h-5" />
+                                                <button
+                                                    onClick={() => handleDeleteTenant(tenant.cliente_slug)}
+                                                    className="p-4 bg-zinc-950 text-zinc-700 hover:text-red-500 hover:bg-red-500/5 rounded-xl transition-all active:scale-90"
+                                                    title="Eliminar Cliente"
+                                                >
+                                                    <Trash2 className="w-5 h-5" />
                                                 </button>
                                             </div>
                                         </div>

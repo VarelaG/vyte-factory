@@ -65,3 +65,32 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Error del servidor' }, { status: 500 });
     }
 }
+export async function DELETE(request: NextRequest) {
+    try {
+        const cookie = request.cookies.get('vyte_master_session');
+        if (!cookie || cookie.value !== 'true') {
+            return NextResponse.json({ error: 'Acceso Denegado' }, { status: 401 });
+        }
+
+        const { searchParams } = new URL(request.url);
+        const slug = searchParams.get('slug');
+
+        if (!slug) {
+            return NextResponse.json({ error: 'Slug es requerido' }, { status: 400 });
+        }
+
+        // No permitir borrar el admin 'vyte' por accidente
+        if (slug === 'vyte') {
+            return NextResponse.json({ error: 'No se puede borrar el administrador maestro' }, { status: 400 });
+        }
+
+        await prisma.tenant.delete({
+            where: { cliente_slug: slug }
+        });
+
+        return NextResponse.json({ success: true, message: 'Cliente eliminado correctamente' });
+    } catch (error) {
+        console.error('Master Delete Error:', error);
+        return NextResponse.json({ error: 'Error del servidor' }, { status: 500 });
+    }
+}

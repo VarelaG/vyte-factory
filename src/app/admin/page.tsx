@@ -4,12 +4,19 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, Settings, LogOut, Check, Image as ImageIcon, Type, AlignLeft, Trash2, Plus, Terminal, RefreshCw, Upload } from 'lucide-react';
 
-type FieldType = 'text' | 'textarea' | 'image';
+type FieldType = 'text' | 'textarea' | 'image' | 'repeater';
+
+interface RepeaterItem {
+    id: string;
+    values: { [key: string]: string };
+}
+
 interface DynamicField {
     id: string;
     label: string;
     type: FieldType;
-    value: string;
+    value?: string;
+    items?: RepeaterItem[]; // Para tipos 'repeater'
 }
 
 // Utilidad simple para leer cookies front-end
@@ -100,6 +107,63 @@ export default function AdminDashboard() {
         }));
     };
 
+    // --- LOGICA DE REPETIDORES ---
+    const addRepeaterItem = (fieldId: string) => {
+        setConfig(prev => ({
+            ...prev,
+            fields: prev.fields.map(f => {
+                if (f.id !== fieldId) return f;
+                const newItem: RepeaterItem = {
+                    id: Math.random().toString(36).substr(2, 9),
+                    values: { title: '', description: '', image: '' }
+                };
+                return { ...f, items: [...(f.items || []), newItem] };
+            })
+        }));
+    };
+
+    const removeRepeaterItem = (fieldId: string, itemId: string) => {
+        setConfig(prev => ({
+            ...prev,
+            fields: prev.fields.map(f => {
+                if (f.id !== fieldId) return f;
+                return { ...f, items: f.items?.filter(item => item.id !== itemId) };
+            })
+        }));
+    };
+
+    const updateRepeaterValue = (fieldId: string, itemId: string, subKey: string, value: string) => {
+        setConfig(prev => ({
+            ...prev,
+            fields: prev.fields.map(f => {
+                if (f.id !== fieldId) return f;
+                return {
+                    ...f,
+                    items: f.items?.map(item =>
+                        item.id === itemId
+                            ? { ...item, values: { ...item.values, [subKey]: value } }
+                            : item
+                    )
+                };
+            })
+        }));
+    };
+
+    const uploadRepeaterImage = async (file: File, fieldId: string, itemId: string) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('slug', tenantSlug);
+
+            const res = await fetch('/api/upload', { method: 'POST', body: formData });
+            if (!res.ok) throw new Error("Error al subir");
+            const { url } = await res.json();
+            updateRepeaterValue(fieldId, itemId, 'image', url);
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
     const uploadImage = async (file: File, fieldId: string) => {
         try {
             const formData = new FormData();
@@ -132,9 +196,15 @@ export default function AdminDashboard() {
             return;
         }
 
+        const fieldToAdd = { ...newField } as DynamicField;
+        if (fieldToAdd.type === 'repeater') {
+            fieldToAdd.items = [];
+            delete fieldToAdd.value;
+        }
+
         setConfig(prev => ({
             ...prev,
-            fields: [...prev.fields, newField as DynamicField]
+            fields: [...prev.fields, fieldToAdd]
         }));
         setNewField({ type: 'text', id: '', label: '', value: '' });
     };
@@ -158,14 +228,25 @@ export default function AdminDashboard() {
                     <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-black font-black text-sm">
                         {tenantSlug.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-sm font-black uppercase tracking-widest truncate max-w-[120px]">{tenantSlug}</span>
+                    <span className="text-sm font-black uppercase tracking-widest truncate max-w-[100px]">{tenantSlug}</span>
                 </div>
-                <button
-                    onClick={handleLogout}
-                    className="p-2 rounded-full bg-white/5 text-zinc-500 hover:text-white transition-colors"
-                >
-                    <LogOut className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                    {isDevUser && (
+                        <button
+                            onClick={() => setDevMode(!devMode)}
+                            className={`p-2 rounded-lg transition-all ${devMode ? 'bg-white text-black' : 'bg-white/5 text-zinc-500'}`}
+                            title={devMode ? 'Modo Dev On' : 'Modo Dev Off'}
+                        >
+                            <Terminal className="w-5 h-5" />
+                        </button>
+                    )}
+                    <button
+                        onClick={handleLogout}
+                        className="p-2 rounded-full bg-white/5 text-zinc-500 hover:text-white transition-colors"
+                    >
+                        <LogOut className="w-5 h-5" />
+                    </button>
+                </div>
             </header>
 
             {/* SIDEBAR (Escritorio) */}
@@ -354,6 +435,63 @@ export default function AdminDashboard() {
                                                         )}
                                                     </div>
                                                 )}
+
+                                                {field.type === 'repeater' && (
+                                                    <div className="space-y-6">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">
+                                                                Lista de {field.label} ({field.items?.length || 0})
+                                                            </span>
+                                                        </div>
+
+                                                        {field.items?.map((item, idx) => (
+                                                            <div key={item.id} className="p-6 bg-[#050505] border border-white/5 rounded-3xl relative group/item">
+                                                                <button
+                                                                    onClick={() => removeRepeaterItem(field.id, item.id)}
+                                                                    className="absolute -top-2 -right-2 w-8 h-8 bg-zinc-900 border border-white/10 rounded-full flex items-center justify-center text-zinc-600 hover:text-red-500 hover:scale-110 transition-all opacity-0 group-hover/item:opacity-100 z-20"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+
+                                                                <div className="space-y-4">
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder="Título..."
+                                                                        value={item.values.title}
+                                                                        onChange={(e) => updateRepeaterValue(field.id, item.id, 'title', e.target.value)}
+                                                                        className="w-full bg-transparent border-b border-white/5 py-2 outline-none focus:border-white/20 text-sm font-bold placeholder-zinc-800"
+                                                                    />
+                                                                    <textarea
+                                                                        placeholder="Descripción..."
+                                                                        rows={2}
+                                                                        value={item.values.description}
+                                                                        onChange={(e) => updateRepeaterValue(field.id, item.id, 'description', e.target.value)}
+                                                                        className="w-full bg-transparent py-2 outline-none text-xs text-zinc-400 placeholder-zinc-800 resize-none"
+                                                                    />
+                                                                    <div className="relative h-32 rounded-2xl overflow-hidden border border-white/5 bg-zinc-950 flex flex-col items-center justify-center group/subimg">
+                                                                        {item.values.image ? (
+                                                                            <img src={item.values.image} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all" />
+                                                                        ) : (
+                                                                            <ImageIcon className="w-6 h-6 text-zinc-800" />
+                                                                        )}
+                                                                        <input
+                                                                            type="file"
+                                                                            className="absolute inset-0 opacity-0 cursor-pointer"
+                                                                            onChange={(e) => e.target.files?.[0] && uploadRepeaterImage(e.target.files[0], field.id, item.id)}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+
+                                                        <button
+                                                            onClick={() => addRepeaterItem(field.id)}
+                                                            className="w-full py-4 border border-dashed border-white/10 rounded-2xl text-[9px] font-black uppercase tracking-widest text-zinc-600 hover:text-white hover:border-white/30 transition-all flex items-center justify-center gap-2"
+                                                        >
+                                                            <Plus className="w-4 h-4" /> Agregar Item
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* ID Badge (Modo Dev) */}
@@ -394,6 +532,7 @@ export default function AdminDashboard() {
                                                 <option value="text">Texto Corto</option>
                                                 <option value="textarea">Texto Largo</option>
                                                 <option value="image">Imagen</option>
+                                                <option value="repeater">Repetidor (Cards)</option>
                                             </select>
                                         </div>
                                         <div>
