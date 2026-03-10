@@ -220,7 +220,7 @@ export default function AdminDashboard() {
     if (!tenantSlug) return null;
 
     return (
-        <div className="flex flex-col md:flex-row h-screen bg-[#050505] text-zinc-100 font-sans overflow-hidden">
+        <div className="flex flex-col md:flex-row h-screen bg-[#050505] text-zinc-100 font-sans overflow-x-hidden md:overflow-hidden">
 
             {/* HEADER MÓVIL (Solo visible en celulares) */}
             <header className="md:hidden flex items-center justify-between px-6 py-4 bg-[#0a0a0a] border-b border-white/5 z-50">
@@ -301,9 +301,9 @@ export default function AdminDashboard() {
             </aside>
 
             {/* MAIN CONTENT */}
-            <main className="flex-1 overflow-y-auto w-full relative h-[calc(100vh-64px)] md:h-screen">
+            <main className="flex-1 overflow-y-auto overflow-x-hidden w-full relative h-[calc(100vh-64px)] md:h-screen">
                 {/* Decoración Minimalista */}
-                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/[0.02] rounded-full blur-[150px] pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/[0.02] rounded-full blur-[150px] pointer-events-none -translate-y-1/2 translate-x-1/2 max-w-full"></div>
 
                 <div className="max-w-6xl mx-auto p-6 md:p-12 lg:p-16 relative z-10">
 

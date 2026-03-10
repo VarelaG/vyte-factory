@@ -49,10 +49,10 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 selection:bg-white selection:text-black">
+        <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 selection:bg-white selection:text-black overflow-x-hidden relative">
             {/* Fondo decorativo minimalista */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-white/[0.02] rounded-full blur-[120px]" />
+            <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-white/[0.02] rounded-full blur-[120px] max-w-full" />
             </div>
 
             <div className="relative z-10 w-full max-w-md">
