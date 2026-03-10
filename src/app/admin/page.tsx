@@ -34,6 +34,7 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [devMode, setDevMode] = useState(false);
+    const [websiteUrl, setWebsiteUrl] = useState<string>('');
 
     // Para Modo Dev, leemos si este usuario ingresó con password maestro
     const [isDevUser, setIsDevUser] = useState(false);
@@ -62,6 +63,7 @@ export default function AdminDashboard() {
                 const data = await response.json();
                 const parsedConfig = typeof data.config === 'string' ? JSON.parse(data.config) : data.config;
                 setConfig({ fields: parsedConfig?.fields || [] });
+                setWebsiteUrl(data.website_url || '');
             }
         } catch (err) {
             console.error("Error al cargar tenant:", err);
@@ -258,7 +260,20 @@ export default function AdminDashboard() {
                         </div>
                         <div className="overflow-hidden">
                             <h1 className="text-lg font-black tracking-tight text-white leading-none truncate uppercase">{tenantSlug}</h1>
-                            <span className="text-[9px] font-black text-zinc-600 tracking-[0.2em] uppercase">Espacio Cliente</span>
+                            <div className="flex flex-col mt-1">
+                                <span className="text-[9px] font-black text-zinc-600 tracking-[0.2em] uppercase">Espacio Cliente</span>
+                                {websiteUrl && (
+                                    <a
+                                        href={websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[8px] font-bold text-white/40 hover:text-white transition-all flex items-center gap-1 mt-1 group"
+                                    >
+                                        <Check className="w-2.5 h-2.5 text-zinc-700 group-hover:text-white" />
+                                        Ver Sitio En Vivo
+                                    </a>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

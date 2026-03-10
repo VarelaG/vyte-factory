@@ -393,8 +393,8 @@ export default function MasterDashboard() {
 
             {/* MODAL CREAR CLIENTE */}
             {modalOpen && (
-                <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center p-8 z-[100]">
-                    <div className="bg-[#050505] border border-white/10 rounded-[3rem] p-10 md:p-16 max-w-xl w-full shadow-[0_50px_100px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-8 z-[100]">
+                    <div className="bg-[#050505] border border-white/10 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-16 max-w-xl w-full shadow-[0_50px_100px_rgba(0,0,0,0.5)] relative overflow-y-auto max-h-[90vh] custom-scrollbar">
                         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
                         <div className="flex flex-col items-center text-center mb-12">

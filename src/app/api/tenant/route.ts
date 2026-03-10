@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
                 id: true,
                 cliente_slug: true,
                 config: true,
+                website_url: true,
                 createdAt: true,
                 updatedAt: true
             }
