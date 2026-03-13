@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, Settings, LogOut, Check, Image as ImageIcon, Type, AlignLeft, Trash2, Plus, Terminal, RefreshCw, Upload } from 'lucide-react';
 
-type FieldType = 'text' | 'textarea' | 'image' | 'repeater' | 'title-desc';
+type FieldType = 'text' | 'textarea' | 'image' | 'repeater' | 'title-desc' | 'title-img' | 'card' | 'link';
 
 interface RepeaterItem {
     id: string;
@@ -17,7 +17,7 @@ interface DynamicField {
     type: FieldType;
     value?: string;
     items?: RepeaterItem[]; // Para tipos 'repeater'
-    compoundValues?: { title: string; description: string }; // Para tipos 'title-desc'
+    compoundValues?: { [key: string]: string }; // Para tipos compuestos
 }
 
 // Utilidad simple para leer cookies front-end
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
         }));
     };
 
-    const updateCompoundValue = (id: string, subKey: 'title' | 'description', value: string) => {
+    const updateCompoundValue = (id: string, subKey: string, value: string) => {
         setConfig(prev => ({
             ...prev,
             fields: prev.fields.map(f => {
@@ -118,12 +118,26 @@ export default function AdminDashboard() {
                 return {
                     ...f,
                     compoundValues: {
-                        ...(f.compoundValues || { title: '', description: '' }),
+                        ...(f.compoundValues || {}),
                         [subKey]: value
                     }
                 };
             })
         }));
+    };
+
+    const uploadCompoundImage = async (file: File, id: string, subKey: string) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('slug', tenantSlug);
+            const res = await fetch('/api/upload', { method: 'POST', body: formData });
+            if (!res.ok) throw new Error("Error al subir");
+            const { url } = await res.json();
+            updateCompoundValue(id, subKey, url);
+        } catch (err: any) {
+            alert(err.message);
+        }
     };
 
     // --- LOGICA DE REPETIDORES ---
@@ -221,6 +235,15 @@ export default function AdminDashboard() {
             delete fieldToAdd.value;
         } else if (fieldToAdd.type === 'title-desc') {
             fieldToAdd.compoundValues = { title: '', description: '' };
+            delete fieldToAdd.value;
+        } else if (fieldToAdd.type === 'title-img') {
+            fieldToAdd.compoundValues = { title: '', image: '' };
+            delete fieldToAdd.value;
+        } else if (fieldToAdd.type === 'card') {
+            fieldToAdd.compoundValues = { title: '', description: '', image: '' };
+            delete fieldToAdd.value;
+        } else if (fieldToAdd.type === 'link') {
+            fieldToAdd.compoundValues = { label: '', url: '' };
             delete fieldToAdd.value;
         }
 
@@ -412,12 +435,14 @@ export default function AdminDashboard() {
                                                         {field.type === 'text' && <Type className="w-4 h-4" />}
                                                         {field.type === 'textarea' && <AlignLeft className="w-4 h-4" />}
                                                         {field.type === 'image' && <ImageIcon className="w-4 h-4" />}
-                                                        {field.type === 'title-desc' && (
-                                                            <div className="flex gap-0.5">
+                                                        {field.type === 'title-img' && (
+                                                            <div className="flex gap-0.5 items-end">
                                                                 <Type className="w-3 h-3" />
-                                                                <AlignLeft className="w-3 h-3 translate-y-1" />
+                                                                <ImageIcon className="w-3 h-3" />
                                                             </div>
                                                         )}
+                                                        {field.type === 'card' && <LayoutDashboard className="w-4 h-4" />}
+                                                        {field.type === 'link' && <Settings className="w-4 h-4" />}
                                                     </div>
                                                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{field.label}</span>
                                                 </div>
@@ -469,6 +494,86 @@ export default function AdminDashboard() {
                                                             onChange={(e) => updateCompoundValue(field.id, 'description', e.target.value)}
                                                             className="w-full px-6 py-4 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white/30 font-bold transition-all text-white placeholder-zinc-800 resize-none text-xs leading-relaxed"
                                                             placeholder="Descripción..."
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                {field.type === 'title-img' && (
+                                                    <div className="space-y-4">
+                                                        <input
+                                                            type="text"
+                                                            value={field.compoundValues?.title || ''}
+                                                            onChange={(e) => updateCompoundValue(field.id, 'title', e.target.value)}
+                                                            className="w-full px-6 py-4 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white/30 font-bold transition-all text-white placeholder-zinc-800 text-sm tracking-wide"
+                                                            placeholder="Título del Banner..."
+                                                        />
+                                                        <div className="relative h-40 rounded-2xl overflow-hidden border border-white/5 bg-zinc-950 flex flex-col items-center justify-center group/subimg">
+                                                            {field.compoundValues?.image ? (
+                                                                <img src={field.compoundValues.image} className="w-full h-full object-cover transition-all" />
+                                                            ) : (
+                                                                <ImageIcon className="w-6 h-6 text-zinc-800" />
+                                                            )}
+                                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/subimg:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
+                                                                <Upload className="w-5 h-5 text-white" />
+                                                            </div>
+                                                            <input
+                                                                type="file"
+                                                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                                                onChange={(e) => e.target.files?.[0] && uploadCompoundImage(e.target.files[0], field.id, 'image')}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {field.type === 'card' && (
+                                                    <div className="space-y-4">
+                                                        <div className="relative h-32 rounded-2xl overflow-hidden border border-white/5 bg-zinc-950 flex flex-col items-center justify-center group/subimg">
+                                                            {field.compoundValues?.image ? (
+                                                                <img src={field.compoundValues.image} className="w-full h-full object-cover transition-all" />
+                                                            ) : (
+                                                                <ImageIcon className="w-5 h-5 text-zinc-800" />
+                                                            )}
+                                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/subimg:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
+                                                                <Upload className="w-4 h-4 text-white" />
+                                                            </div>
+                                                            <input
+                                                                type="file"
+                                                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                                                onChange={(e) => e.target.files?.[0] && uploadCompoundImage(e.target.files[0], field.id, 'image')}
+                                                            />
+                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            value={field.compoundValues?.title || ''}
+                                                            onChange={(e) => updateCompoundValue(field.id, 'title', e.target.value)}
+                                                            className="w-full px-5 py-3 bg-[#050505] border border-white/5 rounded-xl outline-none focus:border-white/30 font-bold transition-all text-white placeholder-zinc-800 text-xs"
+                                                            placeholder="Título..."
+                                                        />
+                                                        <textarea
+                                                            rows={2}
+                                                            value={field.compoundValues?.description || ''}
+                                                            onChange={(e) => updateCompoundValue(field.id, 'description', e.target.value)}
+                                                            className="w-full px-5 py-3 bg-[#050505] border border-white/5 rounded-xl outline-none focus:border-white/30 font-bold transition-all text-zinc-400 placeholder-zinc-800 resize-none text-[10px]"
+                                                            placeholder="Descripción..."
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                {field.type === 'link' && (
+                                                    <div className="space-y-3">
+                                                        <input
+                                                            type="text"
+                                                            value={field.compoundValues?.label || ''}
+                                                            onChange={(e) => updateCompoundValue(field.id, 'label', e.target.value)}
+                                                            className="w-full px-6 py-4 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white/30 font-bold transition-all text-white placeholder-zinc-800 text-xs"
+                                                            placeholder="Texto del Botón (ej: Ver Más)"
+                                                        />
+                                                        <input
+                                                            type="text"
+                                                            value={field.compoundValues?.url || ''}
+                                                            onChange={(e) => updateCompoundValue(field.id, 'url', e.target.value)}
+                                                            className="w-full px-6 py-4 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white/30 font-bold transition-all text-zinc-500 placeholder-zinc-800 text-xs"
+                                                            placeholder="Enlace (ej: https://...)"
                                                         />
                                                     </div>
                                                 )}
@@ -591,8 +696,11 @@ export default function AdminDashboard() {
                                             >
                                                 <option value="text">Texto Corto</option>
                                                 <option value="textarea">Texto Largo</option>
-                                                <option value="title-desc">Título y Descripción</option>
-                                                <option value="image">Imagen</option>
+                                                <option value="title-desc">Combo: Título + Párrafo</option>
+                                                <option value="title-img">Combo: Título + Imagen</option>
+                                                <option value="card">Combo: Carta (T+D+I)</option>
+                                                <option value="link">Combo: Botón (Link)</option>
+                                                <option value="image">Imagen Sola</option>
                                                 <option value="repeater">Repetidor (Cards)</option>
                                             </select>
                                         </div>
