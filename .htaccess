@@ -1,0 +1,18 @@
+# Block WordPress scanner endpoints (site is NOT WordPress)
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# direct WP files
+RewriteRule ^wp-login\.php$ - [F,L]
+RewriteRule ^xmlrpc\.php$ - [F,L]
+RewriteRule ^wp-admin/setup-config\.php$ - [F,L]
+
+# common "wordpress/" folder probes
+RewriteRule ^wordpress/wp-login\.php$ - [F,L]
+RewriteRule ^wordpress/xmlrpc\.php$ - [F,L]
+RewriteRule ^wordpress/wp-admin/setup-config\.php$ - [F,L]
+
+# generic wp-admin probes
+RewriteRule ^wp-admin/ - [F,L]
+RewriteRule ^wordpress/wp-admin/ - [F,L]
+</IfModule>
