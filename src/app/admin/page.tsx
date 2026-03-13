@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, Settings, LogOut, Check, Image as ImageIcon, Type, AlignLeft, Trash2, Plus, Terminal, RefreshCw, Upload } from 'lucide-react';
 
-type FieldType = 'text' | 'textarea' | 'image' | 'repeater';
+type FieldType = 'text' | 'textarea' | 'image' | 'repeater' | 'title-desc';
 
 interface RepeaterItem {
     id: string;
@@ -17,6 +17,7 @@ interface DynamicField {
     type: FieldType;
     value?: string;
     items?: RepeaterItem[]; // Para tipos 'repeater'
+    compoundValues?: { title: string; description: string }; // Para tipos 'title-desc'
 }
 
 // Utilidad simple para leer cookies front-end
@@ -106,6 +107,22 @@ export default function AdminDashboard() {
         setConfig(prev => ({
             ...prev,
             fields: prev.fields.map(f => f.id === id ? { ...f, value } : f)
+        }));
+    };
+
+    const updateCompoundValue = (id: string, subKey: 'title' | 'description', value: string) => {
+        setConfig(prev => ({
+            ...prev,
+            fields: prev.fields.map(f => {
+                if (f.id !== id) return f;
+                return {
+                    ...f,
+                    compoundValues: {
+                        ...(f.compoundValues || { title: '', description: '' }),
+                        [subKey]: value
+                    }
+                };
+            })
         }));
     };
 
@@ -201,6 +218,9 @@ export default function AdminDashboard() {
         const fieldToAdd = { ...newField } as DynamicField;
         if (fieldToAdd.type === 'repeater') {
             fieldToAdd.items = [];
+            delete fieldToAdd.value;
+        } else if (fieldToAdd.type === 'title-desc') {
+            fieldToAdd.compoundValues = { title: '', description: '' };
             delete fieldToAdd.value;
         }
 
@@ -392,6 +412,12 @@ export default function AdminDashboard() {
                                                         {field.type === 'text' && <Type className="w-4 h-4" />}
                                                         {field.type === 'textarea' && <AlignLeft className="w-4 h-4" />}
                                                         {field.type === 'image' && <ImageIcon className="w-4 h-4" />}
+                                                        {field.type === 'title-desc' && (
+                                                            <div className="flex gap-0.5">
+                                                                <Type className="w-3 h-3" />
+                                                                <AlignLeft className="w-3 h-3 translate-y-1" />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{field.label}</span>
                                                 </div>
@@ -426,6 +452,25 @@ export default function AdminDashboard() {
                                                         className="w-full px-6 py-5 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white/30 font-bold transition-all text-white placeholder-zinc-800 resize-none text-sm leading-relaxed"
                                                         placeholder={`Ingresa contenido...`}
                                                     />
+                                                )}
+
+                                                {field.type === 'title-desc' && (
+                                                    <div className="space-y-4">
+                                                        <input
+                                                            type="text"
+                                                            value={field.compoundValues?.title || ''}
+                                                            onChange={(e) => updateCompoundValue(field.id, 'title', e.target.value)}
+                                                            className="w-full px-6 py-4 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white/30 font-bold transition-all text-white placeholder-zinc-800 text-sm tracking-wide"
+                                                            placeholder="Título..."
+                                                        />
+                                                        <textarea
+                                                            rows={3}
+                                                            value={field.compoundValues?.description || ''}
+                                                            onChange={(e) => updateCompoundValue(field.id, 'description', e.target.value)}
+                                                            className="w-full px-6 py-4 bg-[#050505] border border-white/5 rounded-2xl outline-none focus:border-white/30 font-bold transition-all text-white placeholder-zinc-800 resize-none text-xs leading-relaxed"
+                                                            placeholder="Descripción..."
+                                                        />
+                                                    </div>
                                                 )}
 
                                                 {field.type === 'image' && (
@@ -546,6 +591,7 @@ export default function AdminDashboard() {
                                             >
                                                 <option value="text">Texto Corto</option>
                                                 <option value="textarea">Texto Largo</option>
+                                                <option value="title-desc">Título y Descripción</option>
                                                 <option value="image">Imagen</option>
                                                 <option value="repeater">Repetidor (Cards)</option>
                                             </select>
